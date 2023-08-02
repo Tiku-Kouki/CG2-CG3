@@ -860,25 +860,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	VertexData* vertexDate = nullptr;
 	//書き込むためのアドレスを取得
 	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexDate));
-	////左下	
-	//vertexDate[0].position = { -0.5f,-0.5f,0.0f,1.0f };
-	//vertexDate[0].texcoord = { 0.0f,1.0f};
-	////上
-	//vertexDate[1].position = { 0.0f,0.5f,0.0f,1.0f };
-	//vertexDate[1].texcoord = { 0.5f,0.0f };
-	////右下
-	//vertexDate[2].position = { 0.5f,-0.5f,0.0f,1.0f };
-	//vertexDate[2].texcoord = { 1.0f,1.0f };
-
-	////左下	
-	//vertexDate[3].position = { -0.5f,-0.5f,0.5f,1.0f };
-	//vertexDate[3].texcoord = { 0.0f,1.0f };
-	////上
-	//vertexDate[4].position = { 0.0f,0.0f,0.0f,1.0f };
-	//vertexDate[4].texcoord = { 0.5f,0.0f };
-	////右下
-	//vertexDate[5].position = { 0.5f,-0.5f,-0.5f,1.0f };
-	//vertexDate[5].texcoord = { 1.0f,1.0f };
+	
 
 	const float pi = 3.14f;
 	//分割数
