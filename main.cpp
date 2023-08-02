@@ -996,7 +996,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//リソースの先頭のアドレスから使う
 	vertexBufferViewSprite.BufferLocation = vertexResourceSprite->GetGPUVirtualAddress();
 	//使用するリソースのサイズは頂点3つ分のサイズ
-	vertexBufferViewSprite.SizeInBytes = sizeof(VertexData) * 6;
+	vertexBufferViewSprite.SizeInBytes = sizeof(VertexData) * 4;
 	//1頂点あたりのサイズ
 	vertexBufferViewSprite.StrideInBytes = sizeof(VertexData);
 
@@ -1022,23 +1022,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	vertexDateSprite[2].normal = { 0.0f,0.0f ,-1.0f };
 
-	//左下	
-	vertexDateSprite[3].position = { 0.0f,0.0f,0.0f,1.0f };
-	vertexDateSprite[3].texcoord = { 0.0f,0.0f };
+	//上
+	vertexDateSprite[3].position = { 640.0f,0.0f,0.0f,1.0f };
+	vertexDateSprite[3].texcoord = { 1.0f,0.0f };
 
 	vertexDateSprite[3].normal = { 0.0f,0.0f ,-1.0f };
 
-	//上
-	vertexDateSprite[4].position = { 640.0f,0.0f,0.0f,1.0f };
-	vertexDateSprite[4].texcoord = { 1.0f,0.0f };
+	
 
-	vertexDateSprite[4].normal = { 0.0f,0.0f ,-1.0f };
-
-	//右下
-	vertexDateSprite[5].position = { 640.0f,360.0f,0.0f,1.0f };
-	vertexDateSprite[5].texcoord = { 1.0f,1.0f };
-
-	vertexDateSprite[5].normal = { 0.0f,0.0f ,-1.0f };
 
 
 	//Sprite用のTransformationMatrix用のリソースを作る。Matrix4x4 1つ分のサイズを用意する
@@ -1101,7 +1092,23 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	scissorRect.bottom = kClientHeight;
 
 
+	ID3D12Resource* indexResourceSprite = CreateBufferResource(device, sizeof(uint32_t) * 6);
 	
+	D3D12_INDEX_BUFFER_VIEW indexBufferViewSprite{};
+	//
+	indexBufferViewSprite.BufferLocation = indexResourceSprite->GetGPUVirtualAddress();
+	//
+	indexBufferViewSprite.SizeInBytes = sizeof(uint32_t) * 6;
+	//
+	indexBufferViewSprite.Format = DXGI_FORMAT_R32_UINT;
+
+	//インデックスリソースにデータを書き込む
+	uint32_t* indexDataSprite = nullptr;
+	indexResourceSprite->Map(0, nullptr,reinterpret_cast<void**>(&indexDataSprite));
+	indexDataSprite[0] = 0; indexDataSprite[1] = 1; indexDataSprite[2] = 2;
+	indexDataSprite[3] = 1; indexDataSprite[4] = 3; indexDataSprite[5] = 2;
+
+
 
 	//Imguiの初期化。
 	//こういうもん
@@ -1321,14 +1328,22 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			//Spriteの描画
 			commandList->IASetVertexBuffers(0, 1, &vertexBufferViewSprite);
 
+			commandList->IASetIndexBuffer(&indexBufferViewSprite);
+
+
 			//マテリアルのCBufferの場所を設定
 			commandList->SetGraphicsRootConstantBufferView(0, materialResourceSprite->GetGPUVirtualAddress());
 
+			
+
+
 			//TransformationMatrixCBufferの場所を設定
 			commandList->SetGraphicsRootConstantBufferView(1, transformationMatrixResourceSprite->GetGPUVirtualAddress());
+			
+			
 			//描画!　(DrawCall/ドローコール)
-			commandList->DrawInstanced(6, 1, 0, 0);
-
+			//commandList->DrawInstanced(6, 1, 0, 0);
+			commandList->DrawIndexedInstanced(6, 1, 0, 0,0);
 
 			//実際のcommandListのImGuiの描画コマンドを積む
 			ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList);
