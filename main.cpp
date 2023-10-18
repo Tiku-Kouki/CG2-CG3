@@ -1267,10 +1267,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			
 
 			for (uint32_t index = 0; index < kNumInstance; ++index) {
-				Matrix4x4 worldMatrixSprite =
+				Matrix4x4 worldMatrix =
 					MakeAffineMatrix(transforms[index].scale, transforms[index].rotate, transforms[index].translate);
-				Matrix4x4  worldViewProjectionMatrixSprite = Multiply(worldMatrixSprite, Multiply(viewMatrixSprite, projectionMatrixSprite));
-				instancingData[index].WVP = worldViewProjectionMatrixSprite;
+				Matrix4x4  worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
+				instancingData[index].WVP = worldViewProjectionMatrix;
 				instancingData[index].World = worldMatrix;
 
 			}
@@ -1366,8 +1366,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			
 
 			//wvp用のCBufferの場所を設定
-			commandList->SetGraphicsRootConstantBufferView(1, wvpResource->GetGPUVirtualAddress());
-
+			//commandList->SetGraphicsRootConstantBufferView(1, wvpResource->GetGPUVirtualAddress());
+			commandList->SetGraphicsRootDescriptorTable(1, instancingSrvHandleGPU);
 			
 			//SRVのDescriptorTableの先頭の設定。2はrootParamenter[2]である
 			commandList->SetGraphicsRootDescriptorTable(2, useMonsterBall ? textureSrvHandleGPU2 : textureSrvHandleGPU);
@@ -1379,7 +1379,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 			//描画!　(DrawCall/ドローコール)
-			commandList->DrawInstanced(Subdivision_, 1, 0, 0);
+			commandList->DrawInstanced(Subdivision_, kNumInstance, 0, 0);
 			
 			commandList->SetGraphicsRootDescriptorTable(1,  textureSrvHandleGPU);
 
@@ -1400,7 +1400,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			
 			
 			//描画!　(DrawCall/ドローコール)
-			commandList->DrawInstanced(6, kNumInstance, 0, 0);
+			//commandList->DrawInstanced(6, kNumInstance, 0, 0);
 			//commandList->DrawIndexedInstanced(6, 1, 0, 0,0);
 			
 
