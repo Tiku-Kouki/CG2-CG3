@@ -1267,6 +1267,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			
 
 			for (uint32_t index = 0; index < kNumInstance; ++index) {
+				transforms[index].rotate.y += 0.03f;
 				Matrix4x4 worldMatrix =
 					MakeAffineMatrix(transforms[index].scale, transforms[index].rotate, transforms[index].translate);
 				Matrix4x4  worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
@@ -1290,7 +1291,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			ImGui::DragFloat4("materialDataSprite", &materialDataSprite->color.x, 0.01f);
 			
 
-			//ImGui::Checkbox("useMonsterBall", &useMonsterBall);
+			ImGui::Checkbox("useMonsterBall", &useMonsterBall);
 
 			ImGui::DragFloat3("LightColor", &directionalLightData->color.x, 0.1f);
 			ImGui::DragFloat3("LightDirection", &directionalLightData->direction.x, 0.005f);
@@ -1381,22 +1382,22 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			//描画!　(DrawCall/ドローコール)
 			commandList->DrawInstanced(Subdivision_, kNumInstance, 0, 0);
 			
-			commandList->SetGraphicsRootDescriptorTable(1,  textureSrvHandleGPU);
+			//commandList->SetGraphicsRootDescriptorTable(1,  textureSrvHandleGPU);
 
-			//Spriteの描画
-			commandList->IASetVertexBuffers(0, 1, &vertexBufferViewSprite);
+			////Spriteの描画
+			//commandList->IASetVertexBuffers(0, 1, &vertexBufferViewSprite);
 
-			commandList->IASetIndexBuffer(&indexBufferViewSprite);
-
-
-			//マテリアルのCBufferの場所を設定
-			commandList->SetGraphicsRootConstantBufferView(0, materialResourceSprite->GetGPUVirtualAddress());
-
-			
+			//commandList->IASetIndexBuffer(&indexBufferViewSprite);
 
 
-			//TransformationMatrixCBufferの場所を設定
-			commandList->SetGraphicsRootConstantBufferView(1, transformationMatrixResourceSprite->GetGPUVirtualAddress());
+			////マテリアルのCBufferの場所を設定
+			//commandList->SetGraphicsRootConstantBufferView(0, materialResourceSprite->GetGPUVirtualAddress());
+
+			//
+
+
+			////TransformationMatrixCBufferの場所を設定
+			//commandList->SetGraphicsRootConstantBufferView(1, transformationMatrixResourceSprite->GetGPUVirtualAddress());
 			
 			
 			//描画!　(DrawCall/ドローコール)
