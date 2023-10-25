@@ -1289,6 +1289,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 			
 
+			
+
 			//wvp用のCBufferの場所を設定
 			//commandList->SetGraphicsRootConstantBufferView(1, wvpResource->GetGPUVirtualAddress());
 			commandList->SetGraphicsRootDescriptorTable(1, instancingSrvHandleGPU);
@@ -1299,11 +1301,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			commandList->SetGraphicsRootConstantBufferView(3, directionalLightResource->GetGPUVirtualAddress());
 			
 			commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
+			commandList->IASetIndexBuffer(&indexBufferViewSprite);
 			//形状を設定PSOに設定しているものとはまた別。同じものを設定すると考えておけば良い
 			commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 			//描画!　(DrawCall/ドローコール)
-			commandList->DrawInstanced(6, kNumInstance, 0, 0);
+			commandList->DrawIndexedInstanced(6, kNumInstance, 0, 0,0);
 			
 			//commandList->SetGraphicsRootDescriptorTable(1,  textureSrvHandleGPU);
 
