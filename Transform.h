@@ -135,7 +135,7 @@ Matrix4x4 MakePerspectiveFoveMatrix(float fovY, float aspectRatio, float nearCli
 
 	A.m[3][0] = 0.0f;
 	A.m[3][1] = 0.0f;
-	A.m[3][2] = -(nearClip * farClip) / (farClip - nearClip);
+	A.m[3][2] = (- nearClip * farClip) / (farClip - nearClip);
 	A.m[3][3] = 0.0f;
 
 	return A;

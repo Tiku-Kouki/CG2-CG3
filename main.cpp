@@ -884,25 +884,25 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexDate));
 	
 	//左下	
-	vertexDate[0].position = { 0.0f,360.0f,0.0f,1.0f };
+	vertexDate[0].position = { 0.0f,-1.0f,0.0f,1.0f };
 	vertexDate[0].texcoord = { 0.0f,1.0f };
 
 	vertexDate[0].normal = { 0.0f,0.0f ,-1.0f };
 
-	//上
+	//左上
 	vertexDate[1].position = { 0.0f,0.0f,0.0f,1.0f };
 	vertexDate[1].texcoord = { 0.0f,0.0f };
 
 	vertexDate[1].normal = { 0.0f,0.0f ,-1.0f };
 
 	//右下
-	vertexDate[2].position = { 640.0f,360.0f,0.0f,1.0f };
+	vertexDate[2].position = { 1.0f,-1.0f,0.0f,1.0f };
 	vertexDate[2].texcoord = { 1.0f,1.0f };
 
 	vertexDate[2].normal = { 0.0f,0.0f ,-1.0f };
 
-	//上
-	vertexDate[3].position = { 640.0f,0.0f,0.0f,1.0f };
+	//右上
+	vertexDate[3].position = { 1.0f,0.0f,0.0f,1.0f };
 	vertexDate[3].texcoord = { 1.0f,0.0f };
 
 	vertexDate[3].normal = { 0.0f,0.0f ,-1.0f };
@@ -1190,7 +1190,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			
 
 			for (uint32_t index = 0; index < kNumInstance; ++index) {
-				//[index].rotate.y += 0.03f;
+				//transforms[index].rotate.y += 0.03f;
 				Matrix4x4 worldMatrix =
 					MakeAffineMatrix(transforms[index].scale, transforms[index].rotate, transforms[index].translate);
 				Matrix4x4  worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
@@ -1209,9 +1209,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			ImGui::DragFloat3("cameraTranslate", &cameraTransform.translate.x, 0.1f);
 
 
+			for (uint32_t index = 0; index < kNumInstance; ++index) {
+				ImGui::DragFloat3("translateSprite", &transforms[index].translate.x, 0.1f);
+			}
 			
-			//ImGui::DragFloat3("translateSprite", &transformSprite.translate.x, 1.0f);
-			ImGui::DragFloat4("materialDataSprite", &materialDataSprite->color.x, 0.01f);
+			ImGui::DragFloat4("materialDataSprite", &materialData->color.x, 0.01f);
 			
 
 			ImGui::Checkbox("useMonsterBall", &useMonsterBall);
