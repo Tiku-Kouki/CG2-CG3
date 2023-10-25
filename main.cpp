@@ -847,7 +847,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	const uint32_t Subdivision_ = 1536;
 
 	//VertexResourceの関数
-	ID3D12Resource* vertexResource = CreateBufferResource(device, sizeof(VertexData) * Subdivision_);
+	ID3D12Resource* vertexResource = CreateBufferResource(device, sizeof(VertexData) * 6);
 
 	//マテリアル用のリソースを作る。今回はcolor１つ分のサイズを用意する
 	ID3D12Resource* materialResource = CreateBufferResource(device, sizeof(VertexData));
@@ -874,7 +874,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//リソースの先頭のアドレスから使う
 	vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
 	//使用するリソースのサイズは頂点3つ分のサイズ
-	vertexBufferView.SizeInBytes = sizeof(VertexData) * Subdivision_;
+	vertexBufferView.SizeInBytes = sizeof(VertexData) * 4;
 	//1頂点あたりのサイズ
 	vertexBufferView.StrideInBytes = sizeof(VertexData);
 
@@ -883,112 +883,32 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//書き込むためのアドレスを取得
 	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexDate));
 	
+	//左下	
+	vertexDate[0].position = { 0.0f,360.0f,0.0f,1.0f };
+	vertexDate[0].texcoord = { 0.0f,1.0f };
 
-	const float pi = 3.14f;
-	//分割数
-	const uint32_t kSubdivision = 16;
-	//経度分割1つ分の角度
-	const float kLonEvery = float(M_PI) * 2.0f / float(kSubdivision);
-	//緯度分割１つ分の角度
-	const float kLatEvery = float(M_PI) / float(kSubdivision);
-	float u[6] = {0};
-	float v[6] = {0};
+	vertexDate[0].normal = { 0.0f,0.0f ,-1.0f };
+
+	//上
+	vertexDate[1].position = { 0.0f,0.0f,0.0f,1.0f };
+	vertexDate[1].texcoord = { 0.0f,0.0f };
+
+	vertexDate[1].normal = { 0.0f,0.0f ,-1.0f };
+
+	//右下
+	vertexDate[2].position = { 640.0f,360.0f,0.0f,1.0f };
+	vertexDate[2].texcoord = { 1.0f,1.0f };
+
+	vertexDate[2].normal = { 0.0f,0.0f ,-1.0f };
+
+	//上
+	vertexDate[3].position = { 640.0f,0.0f,0.0f,1.0f };
+	vertexDate[3].texcoord = { 1.0f,0.0f };
+
+	vertexDate[3].normal = { 0.0f,0.0f ,-1.0f };
+
+
 	
-	//緯度の方向に分割
-	for (int32_t latIndex = 0; latIndex < kSubdivision; ++latIndex) {
-		float lat = -float(M_PI) / 2.0f + kLatEvery * latIndex;
-
-		for (uint32_t lonIndex = 0; lonIndex < kSubdivision; ++lonIndex) {
-			uint32_t start = (latIndex * kSubdivision + lonIndex) * 6;
-			float lon = lonIndex * kLonEvery;
-			u[0] = float(lonIndex) / float(kSubdivision);
-			v[0] = 1.0f - float(latIndex) / float(kSubdivision);
-
-			//頂点にデータを入力する。基準点a
-			vertexDate[start].position.x = cos(lat) * cos(lon);
-			vertexDate[start].position.y = sin(lat);
-			vertexDate[start].position.z = cos(lat) * sin(lon);
-			vertexDate[start].position.w = 1.0f;
-			vertexDate[start].texcoord = { u[0],v[0]};
-			
-			vertexDate[start].normal.x = vertexDate[start].position.x;
-			vertexDate[start].normal.y = vertexDate[start].position.y;
-			vertexDate[start].normal.z = vertexDate[start].position.z;
-
-
-			u[1] = float(lonIndex) / float(kSubdivision);
-			v[1] = 1.0f - float(latIndex + 1) / float(kSubdivision);
-			//B
-			vertexDate[start + 1].position.x = cos(lat + kLatEvery) * cos(lon);
-			vertexDate[start + 1].position.y = sin(lat + kLatEvery);
-			vertexDate[start + 1].position.z = cos(lat + kLatEvery) * sin(lon);
-			vertexDate[start + 1].position.w = 1.0f;
-			vertexDate[start + 1].texcoord = { u[1],v[1] };
-			
-			vertexDate[start + 1].normal.x = vertexDate[start + 1].position.x;
-			vertexDate[start + 1].normal.y = vertexDate[start + 1].position.y;
-			vertexDate[start + 1].normal.z = vertexDate[start + 1].position.z;
-
-
-			u[2] = float(lonIndex + 1) / float(kSubdivision);
-			v[2] = 1.0f - float(latIndex) / float(kSubdivision);
-			//C
-			vertexDate[start + 2].position.x = cos(lat) * cos(lon+kLonEvery);
-			vertexDate[start + 2].position.y = sin(lat);
-			vertexDate[start + 2].position.z = cos(lat) * sin(lon + kLonEvery);
-			vertexDate[start + 2].position.w = 1.0f;
-			vertexDate[start + 2].texcoord = { u[2],v[2] };
-
-			vertexDate[start + 2].normal.x = vertexDate[start + 2].position.x;
-			vertexDate[start + 2].normal.y = vertexDate[start + 2].position.y;
-			vertexDate[start + 2].normal.z = vertexDate[start + 2].position.z;
-
-
-			u[3] =  float(lonIndex + 1) / float(kSubdivision);
-			v[3] = 1.0f - float(latIndex + 1) / float(kSubdivision);
-			//D
-			vertexDate[start + 3].position.x = cos(lat+kLatEvery) * cos(lon + kLonEvery);
-			vertexDate[start + 3].position.y = sin(lat+kLatEvery);
-			vertexDate[start + 3].position.z = cos(lat+kLatEvery) * sin(lon + kLonEvery);
-			vertexDate[start + 3].position.w = 1.0f;
-			vertexDate[start + 3].texcoord = { u[3],v[3] };
-
-			vertexDate[start + 3].normal.x = vertexDate[start + 3].position.x;
-			vertexDate[start + 3].normal.y = vertexDate[start + 3].position.y;
-			vertexDate[start + 3].normal.z = vertexDate[start + 3].position.z;
-
-
-			u[4] =  float(lonIndex + 1) / float(kSubdivision);
-			v[4] = 1.0f - float(latIndex) / float(kSubdivision);
-			//C
-			vertexDate[start + 4].position.x = cos(lat) * cos(lon + kLonEvery);
-			vertexDate[start + 4].position.y = sin(lat);
-			vertexDate[start + 4].position.z = cos(lat) * sin(lon + kLonEvery);
-			vertexDate[start + 4].position.w = 1.0f;
-			vertexDate[start + 4].texcoord = { u[4],v[4] };
-
-			vertexDate[start + 4].normal.x = vertexDate[start + 4].position.x;
-			vertexDate[start + 4].normal.y = vertexDate[start + 4].position.y;
-			vertexDate[start + 4].normal.z = vertexDate[start + 4].position.z;
-
-
-			u[5] = float(lonIndex) / float(kSubdivision);
-			v[5] = 1.0f - float(latIndex + 1) / float(kSubdivision);
-			//B
-			vertexDate[start + 5].position.x = cos(lat + kLatEvery) * cos(lon);
-			vertexDate[start + 5].position.y = sin(lat + kLatEvery);
-			vertexDate[start + 5].position.z = cos(lat + kLatEvery) * sin(lon);
-			vertexDate[start + 5].position.w = 1.0f;
-			vertexDate[start + 5].texcoord = { u[5],v[5] };
-
-			vertexDate[start + 5].normal.x = vertexDate[start + 5].position.x;
-			vertexDate[start + 5].normal.y = vertexDate[start + 5].position.y;
-			vertexDate[start + 5].normal.z = vertexDate[start + 5].position.z;
-
-
-		}
-	}
-
 
 
 	//Sprite用の頂点リソースを作る
@@ -1243,7 +1163,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
 			//CBufferの更新
-			transform.rotate.y += 0.03f;
+			//transform.rotate.y += 0.03f;
 			Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
 
 
@@ -1270,7 +1190,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			
 
 			for (uint32_t index = 0; index < kNumInstance; ++index) {
-				transforms[index].rotate.y += 0.03f;
+				//[index].rotate.y += 0.03f;
 				Matrix4x4 worldMatrix =
 					MakeAffineMatrix(transforms[index].scale, transforms[index].rotate, transforms[index].translate);
 				Matrix4x4  worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
@@ -1383,7 +1303,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 			//描画!　(DrawCall/ドローコール)
-			commandList->DrawInstanced(Subdivision_, kNumInstance, 0, 0);
+			commandList->DrawInstanced(6, kNumInstance, 0, 0);
 			
 			//commandList->SetGraphicsRootDescriptorTable(1,  textureSrvHandleGPU);
 
