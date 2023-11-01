@@ -11,8 +11,20 @@ struct Transform {
 	Vector3 translate;
 
 };
+
+Vector3 Add(const Vector3& m1, const Vector3& m2) {
+	Vector3 A = {};
+
+	A.x = m1.x + m2.x;
+	A.y = m1.y + m2.y;
+	A.z = m1.z + m2.z;
+
+	return A;
+}
+
+
 Matrix4x4 MakeRotateXMatrix(float theta) {
-	Matrix4x4 A;
+	Matrix4x4 A = {};
 
 	A.m[0][0] = 1.0f;
 	A.m[0][1] = 0.0f;
@@ -37,7 +49,7 @@ Matrix4x4 MakeRotateXMatrix(float theta) {
 	return A;
 }
 Matrix4x4 MakeRotateYMatrix(float theta) {
-	Matrix4x4 A;
+	Matrix4x4 A = {};
 
 	A.m[0][0] = std::cos(theta);
 	A.m[0][1] = 0.0f;
@@ -62,7 +74,7 @@ Matrix4x4 MakeRotateYMatrix(float theta) {
 	return A;
 }
 Matrix4x4 MakeRotateZMatrix(float theta) {
-	Matrix4x4 A;
+	Matrix4x4 A = {};
 
 	A.m[0][0] = std::cos(theta);
 	A.m[0][1] = std::sin(theta);
@@ -143,7 +155,7 @@ Matrix4x4 MakePerspectiveFoveMatrix(float fovY, float aspectRatio, float nearCli
 }
 
 Matrix4x4 Inverse(const Matrix4x4& m) {
-	Matrix4x4 A;
+	Matrix4x4 A = {};
 	float determinant;
 	determinant
 		= +m.m[0][0] * m.m[1][1] * m.m[2][2] * m.m[3][3]

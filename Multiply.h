@@ -1,5 +1,6 @@
 #pragma once
 #include"Matrix4x4.h"
+#include"Vector3.h"
 
 Matrix4x4 Multiply(const Matrix4x4& m1, const Matrix4x4& m2) {
 
@@ -26,3 +27,14 @@ Matrix4x4 Multiply(const Matrix4x4& m1, const Matrix4x4& m2) {
 
 	return A;
 }
+
+Vector3 Multiply(const Vector3& m1, float m2) {
+	Vector3 A = {};
+
+	A.x = m1.x * m2;
+	A.y = m1.y * m2;
+	A.z = m1.z * m2;
+
+	return A;
+}
+
