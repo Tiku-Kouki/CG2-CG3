@@ -860,12 +860,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	
 
-
 	//↓ここ02_02,p08
 	//WVP用のリソースを作る。Matrix4x4 1つ分のサイズを用意する
-	ID3D12Resource* wvpResource = CreateBufferResource(device, sizeof(ParticleForGPU));
+	ID3D12Resource* wvpResource = CreateBufferResource(device, sizeof(TransformationMatrix));
 	//データを書き込む
-	ParticleForGPU* wvpData = nullptr;
+	TransformationMatrix* wvpData = nullptr;
 	//書き込むためのアドレスを取得
 	wvpResource->Map(0, nullptr, reinterpret_cast<void**>(&wvpData));
 	//単位行列を書き込んでおく
@@ -988,9 +987,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
 	//Sprite用のTransformationMatrix用のリソースを作る。Matrix4x4 1つ分のサイズを用意する
-	ID3D12Resource* transformationMatrixResourceSprite = CreateBufferResource(device, sizeof(ParticleForGPU));
+	ID3D12Resource* transformationMatrixResourceSprite = CreateBufferResource(device, sizeof(TransformationMatrix));
 	//データを書き込む
-	ParticleForGPU* transformationMatrixDataSprite = nullptr;
+	TransformationMatrix* transformationMatrixDataSprite = nullptr;
 	//書き込むためのアドレスを取得
 	transformationMatrixResourceSprite->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixDataSprite));
 	//単位行列を書き込んでいく

@@ -2,6 +2,5 @@ struct VertexShaderOutput
 {
 	float32_t4 position : SV_POSITION;
 	float32_t2 texcoord : TEXCOORD0;
-	
 	folat32_t4 color : COLOR0;
 };
