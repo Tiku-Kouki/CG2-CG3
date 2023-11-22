@@ -797,9 +797,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//Depthの機能を有効化する
 	depthStencilDesc.DepthEnable = true;
 	//書き込みします
-	depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+	depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
 	//比較関数は。つまり、近ければ描画される
 	depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+
+	
 
 	//BlendStateの設定
 	D3D12_BLEND_DESC blendDesc{};
@@ -1189,8 +1191,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	}
 
 	const float kDeltaTime = 1.0f / 60.0f;
-	uint32_t numInstance = 0;
-
+	
 	MSG msg{};
 	//ウィンドウの×ボタンが押されるまでループ
 	while (msg.message != WM_QUIT) {
@@ -1205,6 +1206,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			ImGui_ImplDX12_NewFrame();
 			ImGui_ImplWin32_NewFrame();
 			ImGui::NewFrame();
+				
+			
 
 
 			//CBufferの更新
@@ -1233,6 +1236,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 			//↑03_00 P12
 			
+			uint32_t numInstance = 0;
+
+			
 
 			for (uint32_t index = 0; index < kNumMaxInstance; ++index) {
 				
@@ -1240,15 +1246,20 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 					//生存期間を過ぎていたら更新せず描画対象にしない
 					continue;
 				}
+
+				float alpha = 1.0f - (particles[index].currentTime / particles[index].lifeTime);
+
 				Matrix4x4 worldMatrix =
 					MakeAffineMatrix(particles[index].transform.scale, particles[index].transform.rotate, particles[index].transform.translate);
 				Matrix4x4  worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
 
 				particles[index].transform.translate = Add(particles[index].transform.translate,Multiply(particles[index].velocity,kDeltaTime));
 				particles[index].currentTime += kDeltaTime;
-				instancingData[index].WVP = worldViewProjectionMatrix;
-				instancingData[index].World = worldMatrix;
-				instancingData[index].color = particles[index].color;
+				instancingData[numInstance].WVP = worldViewProjectionMatrix;
+				instancingData[numInstance].World = worldMatrix;
+				instancingData[numInstance].color = particles[index].color;
+				instancingData[numInstance].color.w = alpha;
+
 				++numInstance;
 			}
 
