@@ -3,6 +3,60 @@
 #include"Transform.h"
 #include"Multiply.h"
 
+Matrix4x4 MakeTranslateMatrix(Vector3& translate)
+{
+	Matrix4x4 A;
+
+	A.m[0][0] = 1.0f;
+	A.m[0][1] = 0.0f;
+	A.m[0][2] = 0.0f;
+	A.m[0][3] = 0.0f;
+
+	A.m[1][0] = 0.0f;
+	A.m[1][1] = 1.0f;
+	A.m[1][2] = 0.0f;
+	A.m[1][3] = 0.0f;
+
+	A.m[2][0] = 0.0f;
+	A.m[2][1] = 0.0f;
+	A.m[2][2] = 1.0f;
+	A.m[2][3] = 0.0f;
+
+	A.m[3][0] = translate.x;
+	A.m[3][1] = translate.y;
+	A.m[3][2] = translate.z;
+	A.m[3][3] = 1.0f;
+	return A;
+}
+Matrix4x4 MakeScaleMatrix(const Vector3& scale)
+{
+	Matrix4x4 A;
+
+
+	A.m[0][0] = scale.x;
+	A.m[0][1] = 0.0f;
+	A.m[0][2] = 0.0f;
+	A.m[0][3] = 0.0f;
+
+	A.m[1][0] = 0.0f;
+	A.m[1][1] = scale.y;
+	A.m[1][2] = 0.0f;
+	A.m[1][3] = 0.0f;
+
+	A.m[2][0] = 0.0f;
+	A.m[2][1] = 0.0f;
+	A.m[2][2] = scale.z;
+	A.m[2][3] = 0.0f;
+
+	A.m[3][0] = 0.0f;
+	A.m[3][1] = 0.0f;
+	A.m[3][2] = 0.0f;
+	A.m[3][3] = 1.0f;
+	return A;
+
+
+}
+
 Matrix4x4  MakeAffineMatrix(const Vector3& scale, const Vector3& rotate, const Vector3& translate)
 {
 	Matrix4x4 A = {};
@@ -31,6 +85,22 @@ Matrix4x4  MakeAffineMatrix(const Vector3& scale, const Vector3& rotate, const V
 	A.m[3][1] = translate.y;
 	A.m[3][2] = translate.z;
 	A.m[3][3] = 1.0f;
+	return A;
+
+
+}
+Matrix4x4  MakeAffineMatrix2(const Vector3& scale, const Matrix4x4& rotate, const Vector3& translate)
+{
+	Matrix4x4 A = {};
+
+	Matrix4x4 S = MakeScaleMatrix(scale);
+
+	Matrix4x4 T = MakeTranslateMatrix(translate);
+
+
+	A = Multiply(Multiply(S, rotate), T);
+
+	
 	return A;
 
 

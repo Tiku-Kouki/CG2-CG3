@@ -16,6 +16,7 @@
 #include<cmath>
 #include <string>
 #include<random>
+#include <numbers>
 
 
 
@@ -404,7 +405,10 @@ D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(ID3D12DescriptorHeap* descrip
 }
 
 Transform transform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f,},{0.0f,0.0f,0.0f} };
-Transform cameraTransform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-5.0f} };
+Transform cameraTransform{ 
+	{1.0f,1.0f,1.0f},
+	{std::numbers::pi_v<float> / 3.0f,std::numbers::pi_v<float>, 0.0f},
+	{0.0f,23.0f,10.0f} };
 float kWinW = 1280;
 float kWinH = 720;
 Transform transformSprite{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
@@ -413,7 +417,7 @@ bool useMonsterBall = true;
 
 Material material{ 1.0f,1.0f,1.0f,0.0f };
 
-
+bool useBillboard = false;
 
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
@@ -1192,6 +1196,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	const float kDeltaTime = 1.0f / 60.0f;
 	
+
+
+
 	MSG msg{};
 	//ウィンドウの×ボタンが押されるまでループ
 	while (msg.message != WM_QUIT) {
@@ -1217,9 +1224,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 			//WVPMatrix
 			Matrix4x4 cameraMatrix = MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
+			
+
+			
+			
+			 //worldMatrix = MakeAffineMatrix2(transform.scale, billboardMatrix, transform.translate);
+			
 			Matrix4x4 viewMatrix = Inverse(cameraMatrix);
 			Matrix4x4 projectionMatrix = MakePerspectiveFoveMatrix(0.45f, kWinW / kWinH, 0.1f, 100.0f);
 			Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
+
 
 			wvpData->World = worldMatrix;
 			wvpData->WVP = worldViewProjectionMatrix;
@@ -1240,25 +1254,45 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 			
 
+
 			for (uint32_t index = 0; index < kNumMaxInstance; ++index) {
-				
-				if (particles[index].lifeTime <= particles[index].currentTime) {
-					//生存期間を過ぎていたら更新せず描画対象にしない
-					continue;
-				}
+				//
+				//if (particles[index].lifeTime <= particles[index].currentTime) {
+				//	//生存期間を過ぎていたら更新せず描画対象にしない
+				//	continue;
+				//}
 
 				float alpha = 1.0f - (particles[index].currentTime / particles[index].lifeTime);
 
+				Matrix4x4 backToFrontMatrix = MakeRotateYMatrix(std::numbers::pi_v<float>);
+				Matrix4x4 billboardMatrix = Multiply(backToFrontMatrix, cameraMatrix);
+				billboardMatrix.m[3][0] = 0.0f;
+				billboardMatrix.m[3][1] = 0.0f;
+				billboardMatrix.m[3][2] = 0.0f;
+
 				Matrix4x4 worldMatrix =
-					MakeAffineMatrix(particles[index].transform.scale, particles[index].transform.rotate, particles[index].transform.translate);
+					MakeAffineMatrix(
+						particles[index].transform.scale, 
+						particles[index].transform.rotate, 
+						particles[index].transform.translate);
+				
+				if (useBillboard == true) {
+					worldMatrix =
+					MakeAffineMatrix2(
+						particles[index].transform.scale,
+						billboardMatrix,
+						particles[index].transform.translate);
+				}
+				
+				
 				Matrix4x4  worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
 
-				particles[index].transform.translate = Add(particles[index].transform.translate,Multiply(particles[index].velocity,kDeltaTime));
+				//particles[index].transform.translate = Add(particles[index].transform.translate,Multiply(particles[index].velocity,kDeltaTime));
 				particles[index].currentTime += kDeltaTime;
 				instancingData[numInstance].WVP = worldViewProjectionMatrix;
 				instancingData[numInstance].World = worldMatrix;
 				instancingData[numInstance].color = particles[index].color;
-				instancingData[numInstance].color.w = alpha;
+				//instancingData[numInstance].color.w = alpha;
 
 				++numInstance;
 			}
@@ -1280,7 +1314,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			ImGui::DragFloat4("materialDataSprite", &materialData->color.x, 0.01f);
 			
 
-			ImGui::Checkbox("useMonsterBall", &useMonsterBall);
+			ImGui::Checkbox("useBillboard", &useBillboard);
 
 			ImGui::DragFloat3("LightColor", &directionalLightData->color.x, 0.1f);
 			ImGui::DragFloat3("LightDirection", &directionalLightData->direction.x, 0.005f);
