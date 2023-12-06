@@ -82,6 +82,14 @@ struct ParticleForGPU {
 	Vector4 color;
 };
 
+struct Emitter {
+	Transform transform;//!<エミッタのtransform
+	uint32_t count;//!<発生数
+	float frequency;//!<発生頻度
+	float frequencyTime;//!<発生時刻
+
+};
+
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg,
 	WPARAM wparam, LPARAM lparam) {
@@ -1182,15 +1190,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	std::uniform_real_distribution<float> distribution(-1.0, 1.0);
 	std::uniform_real_distribution<float> distColor(0.0f, 1.0f);
 
-	Particle particles[kNumMaxInstance]={};
+	std::list<Particle> particles;
 
 	
 
-	for (uint32_t index = 0; index < kNumMaxInstance; ++index) {
+	for (std::list<Particle>::iterator particleIterator = particles.begin();
+		particleIterator != particles.end();++particleIterator) {
 		
-		particles[index] = MakeNewParticle(randomEngine);
+		particles.push_back(MakeNewParticle(randomEngine));
 		
-		particles[index].color = { distribution(randomEngine),distribution(randomEngine),distribution(randomEngine),1.0f };
+		(*particleIterator).color = { distribution(randomEngine),distribution(randomEngine),distribution(randomEngine),1.0f };
 
 	}
 
@@ -1255,14 +1264,19 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			
 
 
-			for (uint32_t index = 0; index < kNumMaxInstance; ++index) {
-				//
-				//if (particles[index].lifeTime <= particles[index].currentTime) {
-				//	//生存期間を過ぎていたら更新せず描画対象にしない
-				//	continue;
-				//}
+			for (std::list<Particle>::iterator particleIterator =
+				particles.begin();
+				particleIterator != particles.end(); ) {
 
-				float alpha = 1.0f - (particles[index].currentTime / particles[index].lifeTime);
+				if ((*particleIterator).lifeTime <= (*particleIterator).currentTime) {
+
+					particleIterator = particles.erase(particleIterator);
+
+					//生存期間を過ぎていたら更新せず描画対象にしない
+					continue;
+				}
+
+				float alpha = 1.0f - ((*particleIterator).currentTime / (*particleIterator).lifeTime);
 
 				Matrix4x4 backToFrontMatrix = MakeRotateYMatrix(0.0f);
 				Matrix4x4 billboardMatrix = Multiply(backToFrontMatrix, cameraMatrix);
@@ -1272,29 +1286,32 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 				Matrix4x4 worldMatrix =
 					MakeAffineMatrix(
-						particles[index].transform.scale, 
-						particles[index].transform.rotate, 
-						particles[index].transform.translate);
-				
+						(*particleIterator).transform.scale,
+						(*particleIterator).transform.rotate,
+						(*particleIterator).transform.translate);
+
 				if (useBillboard == true) {
 					worldMatrix =
-					MakeAffineMatrix2(
-						particles[index].transform.scale,
-						billboardMatrix,
-						particles[index].transform.translate);
+						MakeAffineMatrix2(
+							(*particleIterator).transform.scale,
+							billboardMatrix,
+							(*particleIterator).transform.translate);
 				}
-				
-				
+
+
 				Matrix4x4  worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
 
+				if (numInstance < kNumMaxInstance) {
 				//particles[index].transform.translate = Add(particles[index].transform.translate,Multiply(particles[index].velocity,kDeltaTime));
-				particles[index].currentTime += kDeltaTime;
+				(*particleIterator).currentTime += kDeltaTime;
 				instancingData[numInstance].WVP = worldViewProjectionMatrix;
-				instancingData[numInstance].World = worldMatrix;
-				instancingData[numInstance].color = particles[index].color;
+				}
+				
+				//instancingData[numInstance].World = worldMatrix;
+				instancingData[numInstance].color = (*particleIterator).color;
 				//instancingData[numInstance].color.w = alpha;
 
-				++numInstance;
+				++particleIterator;
 			}
 
 
@@ -1307,9 +1324,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			ImGui::DragFloat3("cameraTranslate", &cameraTransform.translate.x, 0.1f);
 
 
-			for (uint32_t index = 0; index < kNumMaxInstance; ++index) {
+			/*for (uint32_t index = 0; index < kNumMaxInstance; ++index) {
 				ImGui::DragFloat3("translateSprite", &particles[index].transform.translate.x, 0.1f);
-			}
+			}*/
 			
 			ImGui::DragFloat4("materialDataSprite", &materialData->color.x, 0.01f);
 			
