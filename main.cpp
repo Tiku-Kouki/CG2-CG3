@@ -1264,7 +1264,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 				float alpha = 1.0f - (particles[index].currentTime / particles[index].lifeTime);
 
-				Matrix4x4 backToFrontMatrix = MakeRotateYMatrix(std::numbers::pi_v<float>);
+				Matrix4x4 backToFrontMatrix = MakeRotateYMatrix(0.0f);
 				Matrix4x4 billboardMatrix = Multiply(backToFrontMatrix, cameraMatrix);
 				billboardMatrix.m[3][0] = 0.0f;
 				billboardMatrix.m[3][1] = 0.0f;
