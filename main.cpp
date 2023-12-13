@@ -1320,6 +1320,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 			ImGui::Begin("Window");
 			
+			if (ImGui::Button("Add Particle")) {
+				particles.push_back(MakeNewParticle(randomEngine));
+				particles.push_back(MakeNewParticle(randomEngine));
+				particles.push_back(MakeNewParticle(randomEngine));
+
+
+
+			}
+
 			ImGui::DragFloat3("cameraRotate", &cameraTransform.rotate.x, 0.01f);
 			ImGui::DragFloat3("cameraTranslate", &cameraTransform.translate.x, 0.1f);
 
