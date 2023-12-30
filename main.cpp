@@ -417,7 +417,7 @@ bool useMonsterBall = true;
 
 Material material{ 1.0f,1.0f,1.0f,0.0f };
 
-bool useBillboard = false;
+bool useBillboard = true;
 
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
@@ -445,7 +445,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	HWND hwnd = CreateWindow(
 		wc.lpszClassName,      //　利用するクラス名  
-		L"CG2",                //　タイトルバーの文字
+		L"CG3",                //　タイトルバーの文字
 		WS_OVERLAPPEDWINDOW,   //　よく見るウィンドウスタイル
 		CW_USEDEFAULT,         //　表示X座標(Windowsに任せる)
 		CW_USEDEFAULT,         //　表示Y座標(Windowsに任せる)
