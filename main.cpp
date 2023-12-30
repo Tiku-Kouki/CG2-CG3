@@ -408,7 +408,7 @@ Transform transform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f,},{0.0f,0.0f,0.0f} };
 Transform cameraTransform{ 
 	{1.0f,1.0f,1.0f},
 	{std::numbers::pi_v<float> / 3.0f,std::numbers::pi_v<float>, 0.0f},
-	{0.0f,23.0f,10.0f} };
+	{0.0f,15.0f,10.0f} };
 float kWinW = 1280;
 float kWinH = 720;
 Transform transformSprite{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
@@ -418,6 +418,8 @@ bool useMonsterBall = true;
 Material material{ 1.0f,1.0f,1.0f,0.0f };
 
 bool useBillboard = true;
+
+bool moveParticle = false;
 
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
@@ -445,7 +447,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	HWND hwnd = CreateWindow(
 		wc.lpszClassName,      //　利用するクラス名  
-		L"CG3",                //　タイトルバーの文字
+		L"LE2C_17_チク_コウキ",                //　タイトルバーの文字
 		WS_OVERLAPPEDWINDOW,   //　よく見るウィンドウスタイル
 		CW_USEDEFAULT,         //　表示X座標(Windowsに任せる)
 		CW_USEDEFAULT,         //　表示Y座標(Windowsに任せる)
@@ -1077,7 +1079,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
 	//Instancing用のResource
-	const uint32_t kNumMaxInstance = 10;
+	const uint32_t kNumMaxInstance = 15;
 
 	//#include<wrl.h>がないといけない
 	Microsoft::WRL::ComPtr<ID3D12Resource> instancingResource =
@@ -1114,7 +1116,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	UploadTextureData(textureResource, mipImages);
 
 	//2Textureを読んで転送する
-	DirectX::ScratchImage mipImages2 = LoadTexture("resources/circle.png");
+	DirectX::ScratchImage mipImages2 = LoadTexture("resources/particle.png");
 	const DirectX::TexMetadata& metadata2 = mipImages2.GetMetadata();
 	ID3D12Resource* textureResource2 = CreateTexureResource(device, metadata2);
 	UploadTextureData(textureResource2, mipImages2);
@@ -1256,11 +1258,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
 			for (uint32_t index = 0; index < kNumMaxInstance; ++index) {
-				//
-				//if (particles[index].lifeTime <= particles[index].currentTime) {
-				//	//生存期間を過ぎていたら更新せず描画対象にしない
-				//	continue;
-				//}
+				
+				if (particles[index].lifeTime <= particles[index].currentTime) {
+					//生存期間を過ぎていたら更新せず描画対象にしない
+					continue;
+				}
 
 				float alpha = 1.0f - (particles[index].currentTime / particles[index].lifeTime);
 
@@ -1287,20 +1289,28 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 				
 				Matrix4x4  worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
 
-				//particles[index].transform.translate = Add(particles[index].transform.translate,Multiply(particles[index].velocity,kDeltaTime));
-				particles[index].currentTime += kDeltaTime;
+				if (moveParticle == true) {
+					particles[index].transform.translate = Add(particles[index].transform.translate,Multiply(particles[index].velocity,kDeltaTime));
+					particles[index].currentTime += kDeltaTime;
+				}
 				instancingData[numInstance].WVP = worldViewProjectionMatrix;
 				instancingData[numInstance].World = worldMatrix;
 				instancingData[numInstance].color = particles[index].color;
-				//instancingData[numInstance].color.w = alpha;
-
+				
+					instancingData[numInstance].color.w = alpha;
+				
 				++numInstance;
 			}
 
+			
 
+			ImGui::Begin("moveParticles");
 
+			ImGui::Checkbox("moveParticle", &moveParticle);
 
+			ImGui::End();
 
+            #ifdef _DEBUG
 			ImGui::Begin("Window");
 			
 			ImGui::DragFloat3("cameraRotate", &cameraTransform.rotate.x, 0.01f);
@@ -1315,6 +1325,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			
 
 			ImGui::Checkbox("useBillboard", &useBillboard);
+			
 
 			ImGui::DragFloat3("LightColor", &directionalLightData->color.x, 0.1f);
 			ImGui::DragFloat3("LightDirection", &directionalLightData->direction.x, 0.005f);
@@ -1323,8 +1334,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 			
 			ImGui::End();
+            #endif // DEBUG
 
-			ImGui::ShowDemoWindow();
 
 			//ImGuiの内部コマンドを生成する
 			ImGui::Render();
