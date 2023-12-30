@@ -1302,7 +1302,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 				++numInstance;
 			}
 
-			
+				
 
 			ImGui::Begin("moveParticles");
 
