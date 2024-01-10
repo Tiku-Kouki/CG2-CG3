@@ -413,7 +413,7 @@ float kWinW = 1280;
 float kWinH = 720;
 Transform transformSprite{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 
-bool useMonsterBall = true;
+bool useUvChecker = false;
 
 Material material{ 1.0f,1.0f,1.0f,0.0f };
 
@@ -1306,7 +1306,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 			ImGui::Begin("moveParticles");
 
+			ImGui::Checkbox("useUvChecker", &useUvChecker);
+
 			ImGui::Checkbox("moveParticle", &moveParticle);
+			
 
 			ImGui::End();
 
@@ -1323,7 +1326,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			
 			ImGui::DragFloat4("materialDataSprite", &materialData->color.x, 0.01f);
 			
-
+			
 			ImGui::Checkbox("useBillboard", &useBillboard);
 			
 
@@ -1407,7 +1410,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			commandList->SetGraphicsRootDescriptorTable(1, instancingSrvHandleGPU);
 			
 			//SRVのDescriptorTableの先頭の設定。2はrootParamenter[2]である
-			commandList->SetGraphicsRootDescriptorTable(2, useMonsterBall ? textureSrvHandleGPU2 : textureSrvHandleGPU);
+			commandList->SetGraphicsRootDescriptorTable(2, useUvChecker ? textureSrvHandleGPU : textureSrvHandleGPU2);
 
 			commandList->SetGraphicsRootConstantBufferView(3, directionalLightResource->GetGPUVirtualAddress());
 			
