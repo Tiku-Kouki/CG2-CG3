@@ -237,3 +237,25 @@ Matrix4x4 Inverse(const Matrix4x4& m) {
 
 	return A;
 }
+
+Matrix4x4 Transpose(const Matrix4x4& m) {
+	Matrix4x4 A = {};
+	A.m[0][0] = m.m[0][0];
+	A.m[0][1] = m.m[1][0];
+	A.m[0][2] = m.m[2][0];
+	A.m[0][3] = m.m[3][0];
+	A.m[1][0] = m.m[0][1];
+	A.m[1][1] = m.m[1][1];
+	A.m[1][2] = m.m[2][1];
+	A.m[1][3] = m.m[3][1];
+	A.m[2][0] = m.m[0][2];
+	A.m[2][1] = m.m[1][2];
+	A.m[2][2] = m.m[2][2];
+	A.m[2][3] = m.m[3][2];
+	A.m[3][0] = m.m[0][3];
+	A.m[3][1] = m.m[1][3];
+	A.m[3][2] = m.m[2][3];
+	A.m[3][3] = m.m[3][3];
+
+	return A;
+}

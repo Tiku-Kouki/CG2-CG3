@@ -54,6 +54,8 @@ struct Material {
 struct TransformationMatrix {
 	Matrix4x4 WVP;
 	Matrix4x4 World;
+	Matrix4x4 WorldInverseTranspose;
+
 };
 struct DirectionalLight {
 	Vector4 color;//!<ライトの色
@@ -835,6 +837,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//単位行列を書き込んでおく
 	wvpData->World = MakeIdentity4x4();
 
+	wvpData->WorldInverseTranspose = MakeIdentity4x4();
+
+
 	//↑ここ02_02,p08
 
 	//分割数
@@ -1217,7 +1222,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 			wvpData->World = worldMatrix;
 			wvpData->WVP = worldViewProjectionMatrix;
-
+			wvpData->WorldInverseTranspose =  Transpose(Inverse(worldMatrix));
 		
 
 			//Sprite用のWorldViewProjectionMatrixを作る
@@ -1227,6 +1232,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			Matrix4x4 worldViewProjectionMatrixSprite = Multiply(worldMatrixSprite, Multiply(viewMatrixSprite, projectionMatrixSprite));
 			transformationMatrixDataSprite->World = worldMatrixSprite;
 			transformationMatrixDataSprite->WVP = worldViewProjectionMatrixSprite;
+			transformationMatrixDataSprite->WorldInverseTranspose = worldMatrix;
 
 			//↑03_00 P12
 			
@@ -1235,6 +1241,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			
 			ImGui::DragFloat3("cameraRotate", &cameraTransform.rotate.x, 0.01f);
 			ImGui::DragFloat3("cameraTranslate", &cameraTransform.translate.x, 0.1f);
+			ImGui::DragFloat3("scale", &transform.scale.x, 0.1f);
 
 			ImGui::Checkbox("useMonsterBall", &useMonsterBall);
 
