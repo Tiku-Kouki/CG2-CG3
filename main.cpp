@@ -369,7 +369,7 @@ D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(ID3D12DescriptorHeap* descrip
 	return handleGPU;
 }
 
-Transform transform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f,},{0.0f,0.0f,0.0f} };
+Transform transform{ {1.0f,1.0f,1.0f},{0.0f,5.0f,0.0f,},{0.0f,0.0f,0.0f} };
 Transform cameraTransform{ {1.0f,1.0f,1.0f},{0.4f,0.0f,0.0f},{0.0f,2.3f,-5.0f} };
 float kWinW = 1280;
 float kWinH = 720;
@@ -1205,7 +1205,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
 			//CBufferの更新
-			transform.rotate.y += 0.03f;
+			//transform.rotate.y += 0.03f;
 			Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
 
 
@@ -1240,7 +1240,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 			ImGui::DragFloat3("LightColor", &directionalLightData->color.x, 0.1f);
 			ImGui::DragFloat3("LightDirection", &directionalLightData->direction.x, 0.005f);
-			ImGui::DragFloat("LightIntensity", &directionalLightData->intensity, 1.0f);
+			ImGui::DragFloat("LightIntensity", &directionalLightData->intensity, 0.1f);
 
 
 			
